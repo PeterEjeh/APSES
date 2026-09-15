@@ -39,11 +39,39 @@ async function submitEvaluation(req, res) {
     return res.status(400).json({ message: 'project_id, rubric_id and a non-empty scores array are required' });
   }
 
+  const project = await ProjectModel.findById(project_id);
+  if (!project) return res.status(404).json({ message: 'Project not found' });
+
+  // Dynamically resolve assessor_role based on project context (supervisor vs panel member)
+  let assessorRole = req.body.assessor_role;
+  if (!assessorRole) {
+    if (Number(project.supervisor_id) === Number(req.user.id)) {
+      assessorRole = 'supervisor';
+    } else {
+      assessorRole = 'panel';
+    }
+  }
+
+  // Validate that non-admin assessor is actually assigned to this project
+  if (req.user.role !== 'admin') {
+    if (assessorRole === 'supervisor') {
+      if (Number(project.supervisor_id) !== Number(req.user.id)) {
+        return res.status(403).json({ message: 'You are not the designated supervisor for this project.' });
+      }
+    } else if (assessorRole === 'panel') {
+      const panelMembers = await ProjectModel.getPanelMembersForProject(project_id);
+      const isAssigned = panelMembers.some(m => Number(m.id) === Number(req.user.id));
+      if (!isAssigned) {
+        return res.status(403).json({ message: 'You are not assigned as a defense panel member for this project.' });
+      }
+    }
+  }
+
   const evaluationId = await EvaluationModel.createEvaluation({
     project_id,
     rubric_id,
     assessor_id: req.user.id,
-    assessor_role: req.user.role
+    assessor_role: assessorRole
   });
 
   await EvaluationModel.saveScores(evaluationId, scores);

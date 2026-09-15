@@ -10,7 +10,7 @@ router.use(auth);
 router.post('/', requireRole('student'), upload.single('proposal_file'), asyncWrap(ctrl.submitProject));
 router.get('/mine', requireRole('student'), asyncWrap(ctrl.myProject));
 router.get('/supervisees', requireRole('supervisor'), asyncWrap(ctrl.mySupervisees));
-router.get('/panel-assigned', requireRole('panel'), asyncWrap(ctrl.myPanelProjects));
+router.get('/panel-assigned', requireRole('panel', 'supervisor', 'admin'), asyncWrap(ctrl.myPanelProjects));
 
 router.get('/all', requireRole('admin'), asyncWrap(ctrl.getAllProjects));
 router.get('/pending', requireRole('admin'), asyncWrap(ctrl.listPending));

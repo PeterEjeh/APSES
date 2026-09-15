@@ -11,7 +11,7 @@ router.post('/rubrics', requireRole('admin'), asyncWrap(ctrl.createRubric));
 router.get('/rubric/:rubricId', asyncWrap(ctrl.getRubric));
 
 router.post('/', requireRole('supervisor', 'panel', 'admin'), asyncWrap(ctrl.submitEvaluation));
-router.post('/project/:projectId/rubric/:rubricId/aggregate', requireRole('admin', 'panel'), asyncWrap(ctrl.aggregate));
+router.post('/project/:projectId/rubric/:rubricId/aggregate', requireRole('admin', 'panel', 'supervisor'), asyncWrap(ctrl.aggregate));
 
 router.get('/project/:projectId/result', asyncWrap(ctrl.getFinalResult));
 router.patch('/project/:projectId/publish', requireRole('admin'), asyncWrap(ctrl.publishFinalResult));

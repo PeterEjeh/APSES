@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import client from '../../api/client';
 import ClearanceFormModal from '../../components/ClearanceFormModal';
 import DocumentViewer from '../../components/DocumentViewer';
@@ -74,6 +75,7 @@ const getFileUrl = (filePath) => (filePath ? `${BACKEND_BASE}/${filePath.replace
 
 export default function SupervisorDashboard() {
   const [supervisees,   setSupervisees]   = useState([]);
+  const [panelProjects, setPanelProjects] = useState([]);
   const [userProfile,   setUserProfile]   = useState(null);
   const [loading,       setLoading]       = useState(true);
 
@@ -100,12 +102,14 @@ export default function SupervisorDashboard() {
   async function loadSupervisorData() {
     setLoading(true);
     try {
-      const [supRes, meRes] = await Promise.all([
+      const [supRes, meRes, panelRes] = await Promise.all([
         client.get('/projects/supervisees'),
         client.get('/auth/me'),
+        client.get('/projects/panel-assigned').catch(() => ({ data: [] }))
       ]);
       setSupervisees(supRes.data || []);
       setUserProfile(meRes.data);
+      setPanelProjects(panelRes.data || []);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }
@@ -198,8 +202,50 @@ export default function SupervisorDashboard() {
             <span className="metric-value">{clearedCount} / {supervisees.length}</span>
             <span className="metric-desc">{clearedCount} student{clearedCount !== 1 ? 's' : ''} cleared for defense</span>
           </div>
+          <div className="metric-card" style={{ borderLeft: '4px solid #b45309' }}>
+            <span className="metric-label">Defense Panel Duties</span>
+            <span className="metric-value" style={{ color: '#b45309' }}>{panelProjects.length}</span>
+            <span className="metric-desc">
+              {panelProjects.filter(p => !p.evaluated_at).length} pending evaluation
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* ── Defense Panel Notice Banner (if assigned) ── */}
+      {panelProjects.length > 0 && (
+        <div style={{
+          background: '#fffbeb',
+          border: '1px solid #fde68a',
+          borderRadius: 'var(--radius-md)',
+          padding: '1rem 1.25rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '1rem',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span style={{ fontSize: '1.5rem' }}>⚖️</span>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '0.95rem', color: '#92400e', fontWeight: 600 }}>
+                Defense Panel Assignments ({panelProjects.length} Active)
+              </h4>
+              <p style={{ margin: 0, fontSize: '0.82rem', color: '#b45309', marginTop: '0.15rem' }}>
+                You are assigned to evaluate {panelProjects.length} defense project{panelProjects.length !== 1 ? 's' : ''} ({panelProjects.filter(p => !p.evaluated_at).length} pending grading).
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/panel"
+            className="btn btn-primary btn-sm"
+            style={{ background: '#b45309', borderColor: '#92400e', color: '#ffffff', textDecoration: 'none' }}
+          >
+            Open Defense Panel Workspace →
+          </Link>
+        </div>
+      )}
 
       {/* ── Supervisees Table ── */}
       <div className="card">

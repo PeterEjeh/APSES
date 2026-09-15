@@ -1,19 +1,32 @@
 import { useState, useEffect } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import client from '../api/client';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const location = useLocation();
   const [notifications, setNotifications] = useState([]);
   const [showNotifs, setShowNotifs] = useState(false);
+  const [panelPendingCount, setPanelPendingCount] = useState(0);
 
   useEffect(() => {
     if (user) {
       client.get('/auth/notifications')
         .then(res => setNotifications(res.data))
         .catch(() => {});
+
+      if (user.role === 'supervisor') {
+        client.get('/projects/panel-assigned')
+          .then(res => {
+            const projects = res.data || [];
+            const pending = projects.filter(p => !p.evaluated_at);
+            setPanelPendingCount(pending.length);
+          })
+          .catch(() => {});
+      }
     }
-  }, [user]);
+  }, [user, location.pathname]);
 
   if (!user) return null;
 
@@ -36,6 +49,62 @@ export default function Navbar() {
             <span className="brand-subtitle">Faculty of Computing, ATBU Bauchi</span>
           </div>
         </div>
+
+        {user.role === 'supervisor' && (
+          <nav className="nav-tabs-supervisor" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <Link
+              to="/supervisor"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.42rem 0.85rem',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+                fontWeight: location.pathname === '/supervisor' ? '600' : '500',
+                textDecoration: 'none',
+                background: location.pathname === '/supervisor' ? 'var(--brand-primary)' : 'var(--bg-subtle)',
+                color: location.pathname === '/supervisor' ? '#ffffff' : 'var(--text-secondary)',
+                border: location.pathname === '/supervisor' ? '1px solid var(--brand-primary)' : '1px solid var(--border-color)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span>👥</span> My Supervisees
+            </Link>
+            <Link
+              to="/panel"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.42rem 0.85rem',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+                fontWeight: location.pathname === '/panel' ? '600' : '500',
+                textDecoration: 'none',
+                background: location.pathname === '/panel' ? '#b45309' : 'var(--bg-subtle)',
+                color: location.pathname === '/panel' ? '#ffffff' : 'var(--text-secondary)',
+                border: location.pathname === '/panel' ? '1px solid #b45309' : '1px solid var(--border-color)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span>⚖️</span> Defense Panels
+              {panelPendingCount > 0 && (
+                <span style={{
+                  background: location.pathname === '/panel' ? '#ffffff' : '#f59e0b',
+                  color: location.pathname === '/panel' ? '#b45309' : '#ffffff',
+                  borderRadius: '9999px',
+                  padding: '0.1rem 0.45rem',
+                  fontSize: '0.7rem',
+                  fontWeight: '700',
+                  marginLeft: '0.2rem'
+                }}>
+                  {panelPendingCount}
+                </span>
+              )}
+            </Link>
+          </nav>
+        )}
 
         <div className="nav-user">
           <div style={{ position: 'relative' }}>
@@ -115,7 +184,14 @@ export default function Navbar() {
 
           <div className="user-info">
             <div className="user-name">{user.full_name}</div>
-            <span className={`role-badge ${user.role}`}>{user.role}</span>
+            {user.role === 'supervisor' ? (
+              <div style={{ display: 'flex', gap: '0.3rem', justifyContent: 'flex-end', marginTop: '0.15rem' }}>
+                <span className="role-badge supervisor">Supervisor</span>
+                <span className="role-badge panel">Panel</span>
+              </div>
+            ) : (
+              <span className={`role-badge ${user.role}`}>{user.role}</span>
+            )}
           </div>
 
           <button className="btn btn-secondary btn-sm" onClick={logout}>

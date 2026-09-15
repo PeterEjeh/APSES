@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import client from '../../api/client';
 import DocumentViewer from '../../components/DocumentViewer';
+import { useAuth } from '../../context/AuthContext';
 
 const TOPIC_COLOURS = {
   AI:                    { bg: '#fef9c3', color: '#854d0e', border: '#fde047' },
@@ -15,6 +17,7 @@ const BACKEND_BASE = (process.env.REACT_APP_API_URL || 'http://localhost:5000/ap
 const getFileUrl = (filePath) => (filePath ? `${BACKEND_BASE}/${filePath.replace(/^\//, '')}` : null);
 
 export default function PanelDashboard() {
+  const { user } = useAuth();
   const [allProjects,      setAllProjects]      = useState([]);
   const [rubrics,          setRubrics]          = useState([]);
   const [selectedProjectId,setSelectedProjectId]= useState('');
@@ -111,10 +114,33 @@ export default function PanelDashboard() {
     <div style={{ maxWidth: '960px', margin: '0 auto' }}>
       {/* ── Header card ── */}
       <div className="card">
+        {user?.role === 'supervisor' && (
+          <div style={{ marginBottom: '0.85rem' }}>
+            <Link
+              to="/supervisor"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.82rem',
+                color: 'var(--brand-primary)',
+                textDecoration: 'none',
+                fontWeight: 600
+              }}
+            >
+              ← Back to My Supervisees
+            </Link>
+          </div>
+        )}
         <div className="card-header" style={{ marginBottom: '1rem' }}>
           <div>
             <h2 className="card-title">Panel Defense Evaluation</h2>
-            <span className="role-badge panel" style={{ marginTop: '0.2rem' }}>Panel Member</span>
+            <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.2rem' }}>
+              {user?.role === 'supervisor' && (
+                <span className="role-badge supervisor">Supervisor</span>
+              )}
+              <span className="role-badge panel">Defense Panel Member</span>
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>

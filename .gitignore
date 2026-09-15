@@ -39,3 +39,7 @@ Thumbs.db
 *.sln
 *.sw?
 .gemini/
+
+# Project Specific Exclusions
+backend/scripts/
+screenshots/
