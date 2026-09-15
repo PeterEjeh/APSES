@@ -112,8 +112,19 @@ export default function Register() {
             />
           </div>
 
-          {form.role === 'supervisor' && (
+          {(form.role === 'supervisor' || form.role === 'panel') && (
             <>
+              <div style={{
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.65rem 0.85rem',
+                marginBottom: '1rem',
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)'
+              }}>
+                ℹ️ <strong>Academic Staff:</strong> Staff accounts can both supervise student projects and serve as defense panel evaluators under a single login.
+              </div>
               <div className="form-group">
                 <label>Specializations (comma-separated)</label>
                 <input

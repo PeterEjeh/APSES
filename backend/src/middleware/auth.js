@@ -17,9 +17,19 @@ function authenticate(req, res, next) {
 }
 
 // Restricts a route to one or more roles: authorize('admin'), authorize('supervisor','panel')
+// Academic reciprocity: supervisors and panel members are academic staff and share project supervision/evaluation duties.
 function authorize(...allowedRoles) {
   return (req, res, next) => {
-    if (!req.user || !allowedRoles.includes(req.user.role)) {
+    if (!req.user) {
+      return res.status(403).json({ message: 'You do not have permission to perform this action' });
+    }
+    const userRole = req.user.role;
+    const effectiveRoles = (userRole === 'supervisor' || userRole === 'panel')
+      ? [userRole, 'supervisor', 'panel']
+      : [userRole];
+
+    const hasAccess = allowedRoles.some(r => effectiveRoles.includes(r));
+    if (!hasAccess) {
       return res.status(403).json({ message: 'You do not have permission to perform this action' });
     }
     next();

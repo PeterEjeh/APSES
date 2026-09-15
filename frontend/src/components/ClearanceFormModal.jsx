@@ -248,7 +248,7 @@ export default function ClearanceFormModal({ projectId, role, onClose }) {
                     ['Student Name',  form?.student_name    || '—'],
                     ['Matric No.',     form?.student_matric  || '—'],
                     ['Programme',      form?.programme       || 'B.Sc Computer Science'],
-                    ['Level',          form?.level           || '400 Level'],
+                    ['Level',          form?.level           || '500 Level'],
                     ['Department',     form?.department      || 'Computer Science'],
                     ['Supervisor',     form?.supervisor_name || '—'],
                   ].map(([label, value]) => (

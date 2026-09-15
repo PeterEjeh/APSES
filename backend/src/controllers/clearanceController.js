@@ -16,8 +16,8 @@ async function getClearanceForm(req, res) {
   const project = await ProjectModel.findById(projectId);
   if (!project) return res.status(404).json({ message: 'Project not found' });
 
-  const isStudent    = role === 'student'    && project.student_id   === userId;
-  const isSupervisor = role === 'supervisor' && project.supervisor_id === userId;
+  const isStudent    = role === 'student' && Number(project.student_id) === Number(userId);
+  const isSupervisor = (role === 'supervisor' || role === 'panel') && Number(project.supervisor_id) === Number(userId);
   const isAdmin      = role === 'admin';
 
   if (!isStudent && !isSupervisor && !isAdmin) {
@@ -52,7 +52,7 @@ async function saveClearanceForm(req, res) {
   const project = await ProjectModel.findById(projectId);
   if (!project) return res.status(404).json({ message: 'Project not found' });
 
-  if (project.supervisor_id !== userId) {
+  if (Number(project.supervisor_id) !== Number(userId) && req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Only the assigned supervisor can fill this form' });
   }
 

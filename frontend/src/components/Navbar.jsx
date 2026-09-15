@@ -16,7 +16,7 @@ export default function Navbar() {
         .then(res => setNotifications(res.data))
         .catch(() => {});
 
-      if (user.role === 'supervisor') {
+      if (user.role === 'supervisor' || user.role === 'panel') {
         client.get('/projects/panel-assigned')
           .then(res => {
             const projects = res.data || [];
@@ -50,7 +50,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {user.role === 'supervisor' && (
+        {(user.role === 'supervisor' || user.role === 'panel') && (
           <nav className="nav-tabs-supervisor" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <Link
               to="/supervisor"
@@ -184,7 +184,7 @@ export default function Navbar() {
 
           <div className="user-info">
             <div className="user-name">{user.full_name}</div>
-            {user.role === 'supervisor' ? (
+            {(user.role === 'supervisor' || user.role === 'panel') ? (
               <div style={{ display: 'flex', gap: '0.3rem', justifyContent: 'flex-end', marginTop: '0.15rem' }}>
                 <span className="role-badge supervisor">Supervisor</span>
                 <span className="role-badge panel">Panel</span>

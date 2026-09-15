@@ -24,7 +24,7 @@ async function migrate() {
     }
 
     try {
-      await conn.query(`ALTER TABLE users ADD COLUMN level VARCHAR(20) DEFAULT '400 Level'`);
+      await conn.query(`ALTER TABLE users ADD COLUMN level VARCHAR(20) DEFAULT '500 Level'`);
       console.log('✅ Added users.level');
     } catch (e) {
       if (e.code === 'ER_DUP_FIELDNAME') console.log('ℹ️  users.level already exists');

@@ -26,6 +26,15 @@ async function seed() {
     ['Mariya Isa', 'misa@atbu.edu.ng', password_hash, '20/55777U/1']
   );
 
+  const [panelRes] = await db.query(
+    `INSERT INTO users (full_name, email, password_hash, role_id, matric_or_staff_no) VALUES (?, ?, ?, 3, ?)`,
+    ['Dr. Fatima Aliyu', 'panel@atbu.edu.ng', password_hash, 'STAFF002']
+  );
+  await db.query(
+    `INSERT INTO supervisor_profiles (user_id, specializations, max_students) VALUES (?, ?, ?)`,
+    [panelRes.insertId, 'Cybersecurity,Networks,Databases', 5]
+  );
+
   const [rubricRes] = await db.query(
     `INSERT INTO rubrics (name, created_by) VALUES (?, ?)`,
     ['Final Defense Rubric', adminRes.insertId]
@@ -50,6 +59,7 @@ async function seed() {
   console.log('Seed complete.');
   console.log(`admin: admin@atbu.edu.ng / Password123!`);
   console.log(`supervisor: iyakubu@atbu.edu.ng / Password123!`);
+  console.log(`panel: panel@atbu.edu.ng / Password123!`);
   console.log(`student: misa@atbu.edu.ng / Password123!`);
   process.exit(0);
 }

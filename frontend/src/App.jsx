@@ -24,7 +24,7 @@ export default function App() {
                 <ProtectedRoute roles={['student']}><StudentDashboard /></ProtectedRoute>
               } />
               <Route path="/supervisor" element={
-                <ProtectedRoute roles={['supervisor']}><SupervisorDashboard /></ProtectedRoute>
+                <ProtectedRoute roles={['supervisor', 'panel']}><SupervisorDashboard /></ProtectedRoute>
               } />
               <Route path="/panel" element={
                 <ProtectedRoute roles={['panel', 'supervisor']}><PanelDashboard /></ProtectedRoute>

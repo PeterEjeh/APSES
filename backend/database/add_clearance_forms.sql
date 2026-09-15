@@ -8,7 +8,7 @@ USE apses;
 -- Add programme and level to users (optional student fields)
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS programme VARCHAR(100) DEFAULT 'B.Sc Computer Science',
-  ADD COLUMN IF NOT EXISTS level     VARCHAR(20)  DEFAULT '400 Level';
+  ADD COLUMN IF NOT EXISTS level     VARCHAR(20)  DEFAULT '500 Level';
 
 -- Clearance form table (one per project)
 CREATE TABLE IF NOT EXISTS clearance_forms (

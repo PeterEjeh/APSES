@@ -183,7 +183,10 @@ export default function SupervisorDashboard() {
       <div className="card">
         <div className="card-header">
           <h2 className="card-title">Supervisor Dashboard</h2>
-          <span className="role-badge supervisor">Supervisor</span>
+          <div style={{ display: 'flex', gap: '0.35rem' }}>
+            <span className="role-badge supervisor">Supervisor</span>
+            <span className="role-badge panel">Panel</span>
+          </div>
         </div>
         <div className="metrics-grid">
           <div className="metric-card">

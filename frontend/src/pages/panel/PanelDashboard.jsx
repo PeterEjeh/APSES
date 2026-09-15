@@ -114,7 +114,7 @@ export default function PanelDashboard() {
     <div style={{ maxWidth: '960px', margin: '0 auto' }}>
       {/* ── Header card ── */}
       <div className="card">
-        {user?.role === 'supervisor' && (
+        {(user?.role === 'supervisor' || user?.role === 'panel') && (
           <div style={{ marginBottom: '0.85rem' }}>
             <Link
               to="/supervisor"
@@ -128,7 +128,7 @@ export default function PanelDashboard() {
                 fontWeight: 600
               }}
             >
-              ← Back to My Supervisees
+              ← Switch to My Supervisees
             </Link>
           </div>
         )}
@@ -136,7 +136,7 @@ export default function PanelDashboard() {
           <div>
             <h2 className="card-title">Panel Defense Evaluation</h2>
             <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.2rem' }}>
-              {user?.role === 'supervisor' && (
+              {(user?.role === 'supervisor' || user?.role === 'panel') && (
                 <span className="role-badge supervisor">Supervisor</span>
               )}
               <span className="role-badge panel">Defense Panel Member</span>

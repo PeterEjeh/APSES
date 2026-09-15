@@ -75,7 +75,7 @@ export function generateClearancePDF(form, fields) {
   field('Matric No.',    form?.student_matric  || '—',                     margin + half + 4, y, 22);
   y += 7;
   field('Programme',     form?.programme       || 'B.Sc Computer Science', margin,          y, 32);
-  field('Level',         form?.level           || '400 Level',             margin + half + 4, y, 22);
+  field('Level',         form?.level           || '500 Level',             margin + half + 4, y, 22);
   y += 7;
   field('Supervisor',    form?.supervisor_name || '—',                     margin,          y, 32);
   y += 7;

@@ -36,7 +36,7 @@ async function register(req, res) {
     department
   });
 
-  if (role === 'supervisor') {
+  if (role === 'supervisor' || role === 'panel') {
     const parsedCapacity = max_students ? Math.min(Math.max(parseInt(max_students, 10) || 5, 1), 1000) : 5;
     await db.query(
       `INSERT INTO supervisor_profiles (user_id, specializations, max_students) VALUES (?, ?, ?)`,
@@ -64,8 +64,15 @@ async function login(req, res) {
   );
 
   let supervisorProfile = null;
-  if (user.role === 'supervisor') {
+  if (user.role === 'supervisor' || user.role === 'panel') {
     supervisorProfile = await UserModel.getSupervisorProfile(user.id);
+    if (!supervisorProfile) {
+      await db.query(
+        `INSERT IGNORE INTO supervisor_profiles (user_id, specializations, max_students) VALUES (?, ?, 5)`,
+        [user.id, 'AI, Software Engineering, Networks']
+      );
+      supervisorProfile = await UserModel.getSupervisorProfile(user.id);
+    }
   }
 
   return res.json({
@@ -87,8 +94,15 @@ async function getMe(req, res) {
   if (!user) return res.status(404).json({ message: 'User not found' });
 
   let supervisorProfile = null;
-  if (user.role === 'supervisor') {
+  if (user.role === 'supervisor' || user.role === 'panel') {
     supervisorProfile = await UserModel.getSupervisorProfile(user.id);
+    if (!supervisorProfile) {
+      await db.query(
+        `INSERT IGNORE INTO supervisor_profiles (user_id, specializations, max_students) VALUES (?, ?, 5)`,
+        [user.id, 'AI, Software Engineering, Networks']
+      );
+      supervisorProfile = await UserModel.getSupervisorProfile(user.id);
+    }
   }
 
   res.json({ ...user, supervisorProfile });
